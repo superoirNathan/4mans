@@ -91,6 +91,7 @@ void GameObject::update2(float dt) {
     // We've applied the force, let's remove it so it does not get applied next frame
     force = glm::vec3(0.0f);
     velocity = velocity - (velocity / 2.0f * dt);
+    position = position - (position / 2.0f * dt);
 
 
 }
