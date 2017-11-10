@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Mesh.h"
+#include "Road.h"
 #include "Timer.h"
 #include "ShaderProgram.h"
 #include "GameObject.h"
 #include "Light.h"
-
+#include "ParticleEmitter.h"
 #include <vector>
 
 #define WINDOW_WIDTH 800
@@ -31,36 +32,27 @@ public:
 
 	//Data Member
 	Timer* updateTimer = nullptr;
-	GameObject monkey1, monkey2, gorilla1, cube; 
+	GameObject vehicle; 
+    GameObject temple;
+    Road start;
+    Road end;
+    std::vector<Road*> middle;
+    ParticleEmitter emitter;
+
 	ShaderProgram passThrough;
 	ShaderProgram phongNoTexture;
     ShaderProgram phongColorSide;
     ShaderProgram phong;
     std::vector<Light> pointLights;
+    
 
 	glm::mat4 cameraTransform;
 	glm::mat4 cameraProjection;
-    glm::mat4 lightSpinner;
-
 
 private:
 	bool shouldRotate;
-    bool shouldLightSpin = false;
+	bool shouldRotateRight;
 	bool wKeydown;
-	bool aKeydown;
 	bool sKeydown;
-	bool dKeydown;
-	bool oKeydown;
-	bool pKeydown;
-
-    bool zKeydown;
-    bool xKeydown;
-    bool cKeydown;
-    bool vKeydown;
-    bool qKeydown;
-    bool eKeydown;
-
-    glm::vec3 camMove = glm::uvec3(0.f, 1.f, 0.f);
-
 
 };

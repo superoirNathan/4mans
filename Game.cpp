@@ -27,28 +27,18 @@ void Game::initializeGame()
 	glEnable(GL_DEPTH_TEST);
 	
     Light light1, light2;
-    light1.position = glm::vec4(0.f, 4.f, 0.f, 1.f);
+    light1.position = glm::vec4(0.f, 10.f, 0.f, 1.f);
     light1.originalPosition = light1.position;
-    light1.ambient = glm::vec3(0.05f);
-    light1.diffuse = glm::vec3(0.7f);
+    light1.ambient = glm::vec3(0.0f);
+    light1.diffuse = glm::vec3(1.5f);
     light1.specular = glm::vec3(1.f);
     light1.specularExponent = 50.f;
     light1.consantAttenuation = 1.f;
     light1.linearAttenuation = 0.1f;
     light1.quadraticAttenuation = 0.01f;
 
-    light2.position = glm::vec4(0.f, -4.f, 0.f, 1.f);
-    light2.originalPosition = light2.position;
-    light2.ambient = glm::vec3(0.05f, 0.f, 0.f);
-    light2.diffuse = glm::vec3(0.7f, 0.f, 0.f);
-    light2.specular = glm::vec3(1.f, 0.f, 0.f);
-    light2.specularExponent = 50.f;
-    light2.consantAttenuation = 1.f;
-    light2.linearAttenuation = 0.1f;
-    light2.quadraticAttenuation = 0.01f;
-
-    pointLights.push_back(light1);
-    pointLights.push_back(light2);
+	pointLights.push_back(light1);
+	pointLights.push_back(light2);
 
 	if (!phongNoTexture.load("shaders/Phong.vert", "shaders/PhongNoTexture.frag"))
 	{
@@ -66,69 +56,130 @@ void Game::initializeGame()
         exit(0);
 
     }
-    if (!phongColorSide.load("shaders/phongColorSide.vert", "shaders/phongColorSide.frag"))
-    {
-
-        std::cout << "Shaders failed to initialize" << std::endl;
-        system("Pause");
-        exit(0);
-
-    }
-	Mesh monkey; 
-	if (!monkey.loadFromFile("meshes/Spaceship.obj"))
+	Mesh player; 
+	if (!player.loadFromFile("meshes/Spaceship.obj"))
 	{
 
 		std::cout << "Model failed to load" << std::endl;
 		system("pause");
 		exit(0);
-
-	
     }
-    Mesh gorilla;
- //   if (!gorilla.loadFromFile("meshes/monkey.obj"))
-    if (!gorilla.loadFromFile("meshes/road_proto.obj"))
+    Mesh road_S;
+    if (!road_S.loadFromFile("meshes/road_Straight.obj"))
     {
-
         std::cout << "Model failed to load" << std::endl;
         system("pause");
         exit(0);
     }
 
-
-
-
-	monkey1 = GameObject(monkey);
+ 
     
-    monkey1.loadTexture(TextureType::Diffuse, "textures/fur.png");
-    monkey1.loadTexture(TextureType::Specular, "textures/monkeySpecular.png");
+	vehicle.mesh = (player);
+    temple.mesh = (road_S);
+    start.mesh = (road_S);
+    end.mesh = (road_S);
 
-	monkey2 = GameObject(monkey); 
-
-    monkey2.loadTexture(TextureType::Diffuse, "textures/fullSpecular.png");
-    monkey2.loadTexture(TextureType::Specular, "textures/noSpecular.png");
     
-    gorilla1 = GameObject(gorilla);
-    gorilla1.loadTexture(TextureType::Diffuse, "textures/fullSpecular.png");
-    gorilla1.loadTexture(TextureType::Specular, "textures/fullSpecular.png");
 
-    cube = GameObject(monkey);
+    vehicle.loadTexture(TextureType::Diffuse, "textures/Spaceship_Model.png");
+    vehicle.loadTexture(TextureType::Specular, "textures/FullSpecular.png");
+    vehicle.translate = glm::translate(vehicle.transform, glm::vec3(0.f, 2.f, 2.f));
+    
+    temple.loadTexture(TextureType::Diffuse, "textures/road.png");
+    temple.loadTexture(TextureType::Specular, "textures/FullSpecular.png");   
+    temple.translate = glm::translate(vehicle.transform, glm::vec3(0.f, -2.f, -10.f));
+    
+    start.loadTexture(TextureType::Diffuse, "textures/road.png");
+    start.loadTexture(TextureType::Specular, "textures/FullSpecular.png");
+    start.translate = glm::translate(vehicle.transform, glm::vec3(0.f, -2.f, 0.f));
+
+    for (int i = 0; i < 30; i++) {
+        middle.push_back(new Road(end));
+        middle[i]->loadTexture(TextureType::Diffuse, "textures/road.png");
+        middle[i]->loadTexture(TextureType::Specular, "textures/FullSpecular.png");
+
+        middle[i]->translate = glm::translate(vehicle.transform, glm::vec3(0.f, -2.f, (-10 * i) - 20));
+    }
 
 
-//	monkey1.color = glm::vec4(1.f, 0.f, 0.f, 1.f);
-//	monkey2.color = glm::vec4(0.f, 1.f, 0.f, 1.f);
-//    gorilla1.color = glm::vec4(0.5f, 0.5f, 0.5f, 1.f);
-
-	monkey2.translate = glm::translate(monkey2.transform, glm::vec3(2.f, 0.f, 0.f));
-	monkey1.translate = glm::translate(monkey1.transform, glm::vec3(2.f, 2.f, 2.f));
-    gorilla1.translate = glm::translate(gorilla1.transform, glm::vec3(0.f, 0.f, 10.f));
-    cube.translate = glm::translate(cube.transform, glm::vec3(10.f, 10.f, 10.f));
+    end = start;
+    end.translate = glm::translate(vehicle.transform, glm::vec3(0.f, -2.f, -20.f));
 
 
-	glm::vec3 temp = monkey1.translate * glm::vec4(0,0,0,1);
 
-	cameraTransform = glm::lookAt(glm::vec3( temp - glm::vec3(0.f, 0.f, -5.f)  ), temp, glm::vec3(0.0, 1.0, 0.0));
+	glm::vec3 temp = vehicle.translate * glm::vec4(0,0,0,1);
+	vehicle.forwardDir = glm::vec4(0, 0, 1, 1);
+	vehicle.originalDir = glm::vec4(0, 0, 1, 1);
+
+    temple.transform = temple.translate * vehicle.rotate * glm::scale(glm::mat4(), glm::vec3(vehicle.scale));
+    start.transform = start.translate * vehicle.rotate * glm::scale(glm::mat4(), glm::vec3(vehicle.scale));
+    end.transform = end.translate * vehicle.rotate * glm::scale(glm::mat4(), glm::vec3(vehicle.scale));
+    for (int i = 0; i < 30; i++) {
+        middle.push_back(new Road(end));
+        middle[i]->transform = middle[i]->translate * vehicle.rotate * glm::scale(glm::mat4(), glm::vec3(vehicle.scale));
+    }
+
+	cameraTransform = glm::lookAt(temp + glm::vec3(0, 2, -5), temp + glm::vec3(0,0,5), glm::vec3(0.0, 1.0, 0.0));
 	cameraProjection = glm::perspective(45.f, ((float)WINDOW_WIDTH / (float)WINDOW_HEIGHT), 0.1f, 10000.f);
 
+
+
+    {
+    
+        //please forgive my tardiness, I was half asleep
+
+        emitter.playing = true;
+        emitter.interpolateColour = false;
+
+        //Physics properties
+        emitter.velocity0 = glm::vec3(0.0f, 0.0f, 0.0f);
+        emitter.velocity1 = glm::vec3(0.0f, 0.0f, 0.0f);
+        emitter.emitterPosition = glm::vec3(0.f, 0.f, 0.f);
+        emitter.boxWH = glm::vec3(50.0f);
+        emitter.boxOn = false;
+        //Steer properties                         
+        emitter.taretgOn = false;
+        emitter.fleeOn = false;
+        emitter.magnetOn = false;
+        emitter.repelOn = false;
+        emitter.gravityOn = false;
+        emitter.pathOn = false;
+
+        emitter.targetPos = glm::vec3(0.0f);
+        emitter.fleePos = glm::vec3(0.0f);
+        emitter.magnetPos = glm::vec3(0.0f);
+        emitter.repelPos = glm::vec3(0.0f);
+        emitter.gravity = glm::vec3(0.0f, 1.0f, 0.0f);
+        emitter.pathEnd = glm::vec3(0.0f);
+
+        emitter.targetStrength = 0.0f;
+        emitter.fleeStrength = 0.0f;
+        emitter.magnetStrength = 0.0f;
+        emitter.magnetRadius = 0.0f;
+        emitter.repelStrength = 0.0f;
+        emitter.repelRadius = 0.0f;
+
+        // Range Properties
+        emitter.colour0 = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        emitter.colour1 = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+        emitter.lifeRange = glm::vec2(1.0f, 2.0f);
+        emitter.sizeRange = glm::vec2(15.0f, 25.0f);
+        emitter.spawnRange = glm::vec2(1.0f, 5.0f);
+        emitter.massRange = glm::vec2(0.5f, 0.75f);
+
+        emitter.emitterName = "emitter";
+
+        //other
+        emitter.durationOn = true;
+        emitter.durationRepeat = false;
+        emitter.durationOnX_OffY = glm::vec2(0.0f, 0.0f);
+        emitter.catmullT0 = glm::vec3(0);
+        emitter.catmullT1 = glm::vec3(0);
+        emitter.pathPointStrength = 0.0f;
+        emitter.step = 7;
+        emitter.showEmitter = true;
+        emitter.circleSquare = true;
+    }
 }
 //Happens once per frame, used to update state of the game
 void Game::update()
@@ -137,113 +188,72 @@ void Game::update()
 	updateTimer->tick();
 
 	float deltatime = updateTimer->getElapsedTimeSeconds();
-
+    vehicle.update2(deltatime);
+    emitter.update(deltatime);
 	if (shouldRotate)
 	{
 
-		monkey1.rotate = glm::rotate(monkey1.rotate, deltatime * (glm::pi <float>() / 4.f), glm::vec3(0.f, 1.f, 0.f));
-		monkey2.rotate= glm::rotate(monkey2.rotate , deltatime * (glm::pi <float>() / 4.f), glm::vec3(0.f,1.f,0.f));
+		vehicle.rotate = glm::rotate(vehicle.rotate, deltatime * (glm::pi <float>() / 4.f), glm::vec3(0.f, 1.f, 0.f));
+
+		vehicle.forwardDir = vehicle.rotate * vehicle.originalDir;
+        vehicle.force += (glm::vec3(vehicle.forwardDir));
+
 	}
-    if (shouldLightSpin) 
-    {
-        lightSpinner = glm::rotate(lightSpinner, deltatime * (glm::pi <float>() / 2.f), glm::vec3(0.f, 0.f, 1.0));
-        for (int i = 0; i < pointLights.size();i++) {
-
-            pointLights[i].position = lightSpinner * pointLights[i].originalPosition ;
-        }
-    
-    }
-
-	if (wKeydown)
+	if (shouldRotateRight)
 	{
 
-		monkey1.translate = glm::translate(monkey1.translate, glm::vec3(0.f, 0.f, deltatime*10));
-		monkey2.translate = glm::translate(monkey2.translate, glm::vec3(0.f, 0.f, deltatime * 10));
+		vehicle.rotate = glm::rotate(vehicle.rotate, -deltatime * (glm::pi <float>() / 4.f), glm::vec3(0.f, 1.f, 0.f));
+
+		vehicle.forwardDir = vehicle.rotate * vehicle.originalDir;
+        vehicle.force += (glm::vec3(vehicle.forwardDir));
 
 	}
+
+    if (wKeydown)
+    {
+
+        //		vehicle.translate = glm::translate(vehicle.translate, glm::vec3(vehicle.forwardDir*deltatime * 5.0f));
+        vehicle.force += (glm::vec3(vehicle.forwardDir) * 3.0f);
+    }
+    else
+        vehicle.force = glm::vec3(0.0f);
+
 	if (sKeydown)
 	{
-
-		monkey1.translate = glm::translate(monkey1.translate, glm::vec3(0.f, 0, -deltatime * 10));
-		monkey2.translate = glm::translate(monkey2.translate, glm::vec3(0.f, 0, -deltatime * 10));
-
+		vehicle.translate = glm::translate(vehicle.translate, glm::vec3(vehicle.forwardDir*-deltatime));
 	}
-	if (aKeydown)
-	{
+    vehicle.translate = glm::translate(vehicle.translate, glm::vec3( vehicle.velocity));
 
-		monkey1.translate = glm::translate(monkey1.translate, glm::vec3(deltatime *10, 0.f, 0.f));
-		monkey2.translate = glm::translate(monkey2.translate, glm::vec3(deltatime *10, 0.f, 0.f));
+    //F = T * R * S
 
-	}
-	if (dKeydown)
-	{
-
-		monkey1.translate = glm::translate(monkey1.translate, glm::vec3(-deltatime *10, 0.f, 0.f));
-		monkey2.translate = glm::translate(monkey2.translate, glm::vec3(-deltatime *10, 0.f , 0.f));
-
-	}
-	if (oKeydown)
-	{
-
-		monkey1.scale -= deltatime;
-		monkey2.scale -= deltatime;
-
-	}
-	if (pKeydown)
-	{
-
-		monkey1.scale += deltatime;
-		monkey2.scale += deltatime;
-
-	}
-    if (zKeydown)
-    {
-        camMove += glm::vec3(0.f, 0.f, 1.f);
-    }
-    if (xKeydown)
-    {
-        camMove -= glm::vec3(0.f, 0.f, 1.f);
-    }
-    if (cKeydown)
-    {
-        camMove += glm::vec3(0.f, 1.f, 0.f);
-    }
-    if (vKeydown)
-    {
-        camMove -= glm::vec3(0.f, 1.f, 0.f);
-    }
-    if (qKeydown)
-    {
-        camMove += glm::vec3(1, 0.f, 0.f);
-    }
-    if (eKeydown)
-    {
-        camMove -= glm::vec3(1, 0.f, 0.f);
-    }
-
-	//F = T * R * S
-	monkey1.transform = monkey1.translate * monkey1.rotate * glm::scale(glm::mat4(), glm::vec3(monkey1.scale));
-	monkey2.transform = monkey2.translate * monkey2.rotate * glm::scale(glm::mat4(), glm::vec3(monkey2.scale));
-    gorilla1.transform = gorilla1.translate * gorilla1.rotate * glm::scale(glm::mat4(), glm::vec3(gorilla1.scale));
-
-	glm::vec3 temp = monkey1.translate * glm::vec4(0,0,0,1);
+	vehicle.transform = vehicle.translate * vehicle.rotate * glm::scale(glm::mat4(), glm::vec3(vehicle.scale));
 
 
-        cameraTransform = glm::lookAt(glm::vec3(temp + camMove), temp, glm::vec3(0.0, 1.0, 0.0));
+	glm::vec3 carPosition = vehicle.transform * glm::vec4(0,0,0,1);
+
+	glm::mat4 pivot = vehicle.transform * glm::rotate(glm::mat4(), 3.14f, glm::vec3(0.f, 1.f, 0.f));
+
+	cameraTransform = pivot * (glm::translate(glm::mat4(), glm::vec3(0.f, 4.f, 6.f)) * glm::rotate(glm::mat4(), -0.19739674f, glm::vec3(1.f, 0.f, 0.f)));
+	cameraTransform = glm::inverse(cameraTransform);
+	glm::vec4 camPos = cameraTransform * glm::vec4(0, 0, 0, 1);
+    
 }
 
 void Game::draw()
 {
-	glClearColor(0, 0, 0, 1);
+	glClearColor(0.2, 0.2, 0.2, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	monkey1.draw( phong, cameraTransform, cameraProjection, pointLights); 
-	monkey2.draw( phong, cameraTransform, cameraProjection, pointLights);
-	gorilla1.draw(phongNoTexture, cameraTransform, cameraProjection, pointLights);
+	vehicle.draw(phong, cameraTransform, cameraProjection, pointLights); 
+    temple.draw(phong, cameraTransform, cameraProjection, pointLights);
+     start.draw(phong, cameraTransform, cameraProjection, pointLights);
+     end.draw(phong, cameraTransform, cameraProjection, pointLights);
 
-    cube.draw(phongColorSide, cameraTransform, cameraProjection, pointLights);
-	
-	glutSwapBuffers();
+     for (int i = 0; i < 30; i++) {
+         middle[i]->draw(phong, cameraTransform, cameraProjection, pointLights);
+     }
+     
+     glutSwapBuffers();
 
 }
 
@@ -263,38 +273,14 @@ void Game::keyboardDown(unsigned char key, int mouseX, int mouseY)
 		wKeydown = true;
 		break;
 	case 'a':
-		aKeydown = true;
+		shouldRotate = true;
 		break;
 	case 's':
 		sKeydown = true;
 	break;
 	case 'd':
-		dKeydown = true;
+		shouldRotateRight = true;
 		break;
-	case 'o':
-		oKeydown = true;
-		break;
-	case 'p':
-		pKeydown = true;
-		break;
-    case 'z':
-        zKeydown = true;
-        break;
-    case 'x':
-        xKeydown = true;
-        break;
-    case 'c':
-        cKeydown = true;
-        break;
-    case 'v':
-        vKeydown = true;
-        break;
-    case 'q':
-        qKeydown = true;
-        break;
-    case 'e':
-        eKeydown = true;
-        break;
     default:
 		break;
 	}
@@ -309,45 +295,19 @@ void Game::keyboardUp(unsigned char key, int mouseX, int mouseY)
 	case 'r':
 		shouldRotate = !shouldRotate;
 		break;
-    case 'l':
-        shouldLightSpin = !shouldLightSpin;
-        break;
 	case 'w':
 		wKeydown = false;
 		break;	   
 	case 'a':	   
-		aKeydown = false;
+		shouldRotate = false;
 		break;	   
 	case 's':	   
 		sKeydown = false;
 		break;	   
 	case 'd':	   
-		dKeydown = false;
+		shouldRotateRight = false;
 		break;
-	case 'o':
-		oKeydown = false;
-		break;
-	case 'p':
-		pKeydown = false;
-		break;
-    case 'z':
-        zKeydown = false;
-        break;
-    case 'x':
-        xKeydown = false;
-        break;
-    case 'c':
-        cKeydown = false;
-        break;
-    case 'v':
-        vKeydown = false;
-        break;
-    case 'q':
-        qKeydown = false;
-        break;
-    case 'e':
-        eKeydown = false;
-        break;
+
 	default:
 		break;
 	}
@@ -362,6 +322,10 @@ void Game::mouseClicked(int button, int state, int x, int y)
 		switch (button)
 		{
 		case GLUT_LEFT_BUTTON:
+        case 'p':
+            vehicle.forwardDir = glm::vec4(0, 0, 1, 1);
+            vehicle.originalDir = glm::vec4(0, 0, 1, 1);
+            break;
 			break;
 		case GLUT_RIGHT_BUTTON:
 			break;
